@@ -5,7 +5,7 @@ from utils import calculate_dday, calculate_todo_rate, format_todos_for_calendar
 
 st.set_page_config(page_title="컬러풀 캘린더 & 다이어리", layout="wide")
 
-# 탭 글씨 크기 수정 (16px) 및 UI 깔끔하게 세팅
+# 탭 폰트 스타일 세팅
 st.markdown("""
     <style>
     .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
@@ -29,34 +29,26 @@ if "todos" not in st.session_state:
 if "diaries" not in st.session_state:
     st.session_state.diaries = {}
 
-# 현재 활성화된 탭을 기억하는 세션 변수 (기본값 0: 달력 탭)
-if "current_tab" not in st.session_state:
-    st.session_state.current_tab = 0
-
-# 현재 선택된 날짜를 기억하는 세션 변수
-if "selected_date" not in st.session_state:
-    st.session_state.selected_date = str(k_today)
-
 # --- 사이드바: 디데이 ---
 with st.sidebar:
     st.header("🎯 중요 마감일")
     dday_name = st.text_input("제목", "종강일")
     dday_date = st.date_input("날짜", k_today + datetime.timedelta(days=10))
     st.metric(label=dday_name, value=calculate_dday(dday_date))
-    
-    st.markdown("---")
-    # 현재 어떤 날짜가 선택되어 있는지 사이드바에 명확히 박아줍니다.
-    st.success(f"📅 현재 선택된 날짜:\n**{st.session_state.selected_date}**")
 
-# --- 메인 탭 구성 (렌더링을 위해 변수에 담음) ---
-# 기존 st.tabs 대신 공통 컴포넌트로 관리하여 클릭 시 강제 탭 이동이 가능하게 만듭니다.
-tab_titles = ["🗓️ 월간 캘린더", "📋 할 일 관리", "✍️ 오늘의 일기", "📊 통계"]
+# --- 핵심 해결 포인트: 상단에 고정된 날짜 조작 바 ---
+st.markdown("---")
+col_date1, col_date2 = st.columns([2, 5])
+with col_date1:
+    # 클릭 에러가 전혀 없는 스트림릿 공식 날짜 선택기
+    sel_date_obj = st.date_input("📅 작업할 날짜를 선택하세요", k_today)
+st.markdown("---")
 
-# 세션에 저장된 current_tab 번호를 기반으로 스트림릿 탭을 활성화합니다.
-tabs = st.tabs(tab_titles)
+# --- 메인 탭 구성 ---
+tab1, tab2, tab3, tab4 = st.tabs(["🗓️ 월간 캘린더", "📋 할 일 관리", "✍️ 오늘의 일기", "📊 통계"])
 
-# --- Tab 1: 진짜 달력 ---
-with tabs[0]:
+# --- Tab 1: 진짜 달력 (조회용) ---
+with tab1:
     st.subheader("이번 달 일정 한눈에 보기")
     events = format_todos_for_calendar(st.session_state.todos)
     
@@ -64,34 +56,18 @@ with tabs[0]:
         "headerToolbar": {"left": "today prev,next", "center": "title", "right": "dayGridMonth,timeGridWeek"},
         "initialView": "dayGridMonth",
         "initialDate": str(k_today),
-        "selectable": True,
+        "selectable": False,  # 👈 오작동을 만드는 달력 자체 클릭 기능을 끄고 안전하게 조회용으로만 씁니다.
         "height": 600,
         "displayEventTime": False,
     }
     
-    cal_state = calendar(events=events, options=calendar_options, key="main_calendar")
-    
-    # 달력 클릭 이벤트 처리
-    new_date = None
-    if cal_state.get("select") is not None:
-        new_date = cal_state["select"]["start"].split("T")[0]
-    elif cal_state.get("eventClick") is not None:
-        new_date = cal_state["eventClick"]["event"]["start"].split("T")[0]
-        
-    # 만약 새로운 날짜가 클릭되었다면!
-    if new_date and st.session_state.selected_date != new_date:
-        st.session_state.selected_date = new_date
-        # 🌟 중요: 날짜를 클릭하면 자동으로 '📋 할 일 관리'(1번 탭)으로 화면을 넘겨버립니다!
-        st.session_state.current_tab = 1
-        st.rerun()
-
-# 현재 선택된 날짜 객체 생성
-sel_date_obj = datetime.datetime.strptime(st.session_state.selected_date, "%Y-%m-%d").date()
+    # 달력 그리기
+    calendar(events=events, options=calendar_options, key="main_calendar")
 
 # --- Tab 2: 할 일 관리 ---
-with tabs[1]:
+with tab2:
     st.header(f"📌 {sel_date_obj.strftime('%m/%d')} 일정 관리")
-    current_todos = [t for t in st.session_state.todos if str(t["날짜"]) == st.session_state.selected_date]
+    current_todos = [t for t in st.session_state.todos if t["날짜"] == sel_date_obj]
     
     if current_todos:
         for i, todo in enumerate(current_todos):
@@ -106,7 +82,7 @@ with tabs[1]:
             else:
                 c2.markdown(content_display, unsafe_allow_html=True)
                 
-            todo["완료"] = c3.checkbox("완료", value=todo["완료"], key=f"todo_{i}_{todo['시간']}_{st.session_state.selected_date}")
+            todo["완료"] = c3.checkbox("완료", value=todo["완료"], key=f"todo_{i}_{todo['시간']}_{sel_date_obj}")
     else:
         st.info(f"{sel_date_obj.strftime('%m/%d')}에 등록된 일정이 없습니다. 아래에서 새로 추가해 보세요!")
 
@@ -126,7 +102,7 @@ with tabs[1]:
                 st.rerun()
 
 # --- Tab 3: 다이어리 ---
-with tabs[2]:
+with tab3:
     st.header(f"✍️ {sel_date_obj.strftime('%m/%d')} 일기장")
     current_diary = st.session_state.diaries.get(sel_date_obj, "")
     diary_input = st.text_area("오늘의 이야기를 기록하고 아래 버튼을 눌러 저장하세요.", value=current_diary, height=300)
@@ -135,9 +111,9 @@ with tabs[2]:
         st.success(f"{sel_date_obj.strftime('%m/%d')} 일기가 안전하게 저장되었습니다!")
 
 # --- Tab 4: 통계 ---
-with tabs[3]:
+with tab4:
     st.header(f"📊 {sel_date_obj.strftime('%m/%d')} 일정 분석")
-    current_todos = [t for t in st.session_state.todos if str(t["날짜"]) == st.session_state.selected_date]
+    current_todos = [t for t in st.session_state.todos if t["날짜"] == sel_date_obj]
     rate = calculate_todo_rate(current_todos)
     st.metric("오늘의 계획 달성률", f"{rate:.1f}%")
     
