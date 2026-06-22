@@ -87,20 +87,21 @@ with tab2:
 
     st.divider()
     st.write("### ➕ 새 일정 추가")
-    with st.form("add_todo_form", clear_on_submit=True):
-        col1, col2, col3 = st.columns([1, 2, 1])
-        new_time = col1.text_input("시간 (하루종일 체크 시 제외)", "12:00")
-        new_content = col2.text_input("내용")
-        new_cat = col3.selectbox("카테고리", ["학교", "공부", "약속", "알바", "기타"])
+    col1, col2, col3, col4 = st.columns([1, 1, 2, 1]) 
+    new_time = col1.text_input("시작 시간", "12:00")
+    new_end_time = col2.text_input("종료 시간", "13:00") # 👈 종료 시간 입력칸 새로 추가!
+    new_content = col3.text_input("내용")
+    new_cat = col4.selectbox("카테고리", ["학교", "공부", "약속", "알바", "기타"])
+
+     # 🌟 '하루 종일' 여부를 선택하는 체크박스를 폼 안에 추가합니다!
+    is_allday = st.checkbox("📅 하루 종일 (체크하면 위클리 달력 맨 위 allday 칸에 들어갑니다)")
         
-        # 🌟 '하루 종일' 여부를 선택하는 체크박스를 폼 안에 추가합니다!
-        is_allday = st.checkbox("📅 하루 종일 (체크하면 위클리 달력 맨 위 allday 칸에 들어갑니다)")
-        
-        if st.form_submit_button("추가하기"):
+    if st.form_submit_button("추가하기"):
             if new_content:
                 st.session_state.todos.append({
                     "날짜": sel_date_obj, 
                     "시간": new_time, 
+                    "종료시간": new_end_time,
                     "내용": new_content, 
                     "카테고리": new_cat, 
                     "완료": False,
