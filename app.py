@@ -22,10 +22,8 @@ k_today = get_korea_today()
 # --- 세션 상태 초기화 ---
 if "todos" not in st.session_state:
     st.session_state.todos = [
-        {"날짜": datetime.date(2026, 6, 23), "시간": "10:00", "내용": "프로젝트 배포하기", "카테고리": "공부", "완료": True},
-        {"날짜": datetime.date(2026, 6, 23), "시간": "14:00", "내용": "종강 파티 참석", "카테고리": "약속", "완료": False},
-        {"날짜": datetime.date(2026, 6, 24), "시간": "18:00", "내용": "카페 알바 대타", "카테고리": "알바", "완료": False},
-    ]
+        {"날짜": datetime.date(2026, 6, 23), "시간": "14:00", "내용": "과제 제출", "카테고리": "공부", "완료": True},
+        {"날짜": datetime.date(2026, 6, 23), "시간": "15:00", "내용": "비프 보강", "카테고리": "학교", "완료": False},
 if "diaries" not in st.session_state:
     st.session_state.diaries = {}
 
