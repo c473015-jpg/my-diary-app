@@ -24,6 +24,7 @@ if "todos" not in st.session_state:
     st.session_state.todos = [
         {"날짜": datetime.date(2026, 6, 23), "시간": "14:00", "내용": "과제 제출", "카테고리": "공부", "완료": True},
         {"날짜": datetime.date(2026, 6, 23), "시간": "15:00", "내용": "비프 보강", "카테고리": "학교", "완료": False},
+    ]
 if "diaries" not in st.session_state:
     st.session_state.diaries = {}
 
