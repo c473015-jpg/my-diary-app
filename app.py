@@ -97,18 +97,18 @@ with tab2:
     is_allday = st.checkbox("📅 하루 종일 (체크하면 위클리 달력 맨 위 allday 칸에 들어갑니다)")
         
     if st.form_submit_button("추가하기"):
-            if new_content:
-                st.session_state.todos.append({
-                    "날짜": sel_date_obj, 
-                    "시간": new_time, 
-                    "종료시간": new_end_time,
-                    "내용": new_content, 
-                    "카테고리": new_cat, 
-                    "완료": False,
-                    "하루종일": is_allday # 👈 여기에 체크 여부 저장!
-                })
-                st.success("일정이 추가되었습니다!")
-                st.rerun()
+        if new_content:
+            st.session_state.todos.append({
+                "날짜": sel_date_obj, 
+                "시간": new_time, 
+                "종료시간": new_end_time,
+                "내용": new_content, 
+                "카테고리": new_cat, 
+                "완료": False,
+                "하루종일": is_allday # 👈 여기에 체크 여부 저장!
+            })
+            st.success("일정이 추가되었습니다!")
+            st.rerun()
 
 # --- Tab 3: 다이어리 ---
 with tab3:
