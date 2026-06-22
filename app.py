@@ -71,7 +71,7 @@ with tab2:
     if current_todos:
         for i, todo in enumerate(current_todos):
             c1, c2, c3 = st.columns([1, 4, 1])
-            c1.write(f"🕒 {todo['시간']}")
+            c1.write(f"🕒 {todo['시간']} ~ {todo.get('종료시간', todo['시간'])}")
             color_codes = {"학교":"#9B59B6", "공부":"#3498DB", "약속":"#E67E22", "알바":"#E74C3C", "기타":"#95A5A6"}
             cat_color = color_codes.get(todo['카테고리'], "#000")
             
@@ -87,28 +87,29 @@ with tab2:
 
     st.divider()
     st.write("### ➕ 새 일정 추가")
-    col1, col2, col3, col4 = st.columns([1, 1, 2, 1]) 
-    new_time = col1.text_input("시작 시간", "12:00")
-    new_end_time = col2.text_input("종료 시간", "13:00") # 👈 종료 시간 입력칸 새로 추가!
-    new_content = col3.text_input("내용")
-    new_cat = col4.selectbox("카테고리", ["학교", "공부", "약속", "알바", "기타"])
+    with st.form("add_todo_form", clear_on_submit=True):
+        col1, col2, col3, col4 = st.columns([1, 1, 2, 1]) 
+        new_time = col1.text_input("시작 시간", "12:00")
+        new_end_time = col2.text_input("종료 시간", "13:00") # 👈 종료 시간 입력칸 새로 추가!
+        new_content = col3.text_input("내용")
+        new_cat = col4.selectbox("카테고리", ["학교", "공부", "약속", "알바", "기타"])
 
      # 🌟 '하루 종일' 여부를 선택하는 체크박스를 폼 안에 추가합니다!
-    is_allday = st.checkbox("📅 하루 종일 (체크하면 위클리 달력 맨 위 allday 칸에 들어갑니다)")
+        is_allday = st.checkbox("📅 하루 종일 (체크하면 위클리 달력 맨 위 allday 칸에 들어갑니다)")
         
-    if st.form_submit_button("추가하기"):
-        if new_content:
-            st.session_state.todos.append({
-                "날짜": sel_date_obj, 
-                "시간": new_time, 
-                "종료시간": new_end_time,
-                "내용": new_content, 
-                "카테고리": new_cat, 
-                "완료": False,
-                "하루종일": is_allday # 👈 여기에 체크 여부 저장!
-            })
-            st.success("일정이 추가되었습니다!")
-            st.rerun()
+        if st.form_submit_button("추가하기"):
+            if new_content:
+                st.session_state.todos.append({
+                    "날짜": sel_date_obj, 
+                    "시간": new_time, 
+                    "종료시간": new_end_time,
+                    "내용": new_content, 
+                    "카테고리": new_cat, 
+                    "완료": False,
+                    "하루종일": is_allday # 👈 여기에 체크 여부 저장!
+                })
+                st.success("일정이 추가되었습니다!")
+                st.rerun()
 
 # --- Tab 3: 다이어리 ---
 with tab3:
