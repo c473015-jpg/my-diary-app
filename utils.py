@@ -33,7 +33,7 @@ def _format_time_to_pm(time_str):
         return time_str
     
 def format_todos_for_calendar(todos):
-    """일정 데이터를 카테고리별 색상과 종료 시간까지 반영하여 달력 포맷으로 변환합니다."""
+    """일정 데이터를 카테고리별 색상만 입혀 월간 달력에 깔끔하게 나오도록 변환합니다."""
     COLOR_MAP = {
         "학교": "#9B59B6",      # 보라색
         "공부": "#3498DB",      # 파란색
@@ -44,27 +44,24 @@ def format_todos_for_calendar(todos):
     
     calendar_events = []
     for todo in todos:
-        title_prefix = "✅ " if todo["완료"] else ""
         color = COLOR_MAP.get(todo["카테고리"], "#34495E")
+        
+        # 🌟 달력 사각형 박스 안에는 오직 [카테고리]와 내용만 깔끔하게 표시합니다!
+        event_title = f"[{todo['카테고리']}] {todo['내용']}"
         
         if todo.get("하루종일", False):
             calendar_events.append({
-                "title": f"{title_prefix}[{todo['카테고리']}] {todo['내용']}",
+                "title": event_title,
                 "start": f"{todo['날짜']}",
                 "backgroundColor": color,
                 "borderColor": color,
                 "allDay": True
             })
         else:
-            # 🌟 시작 시간과 종료 시간을 모두 am/pm으로 변환하는 로직
-            start_time_pm = _format_time_to_pm(todo["시간"])
-            end_time_pm = _format_time_to_pm(todo.get("종료시간", todo["시간"]))
-            
             calendar_events.append({
-                # 달력 제목에 시작~종료 시간 다 나오게 변경
-                "title": f"{title_prefix}[{start_time_pm}~{end_time_pm}] [{todo['카테고리']}] {todo['내용']}",
+                "title": event_title,
                 "start": f"{todo['날짜']}T{todo['시간']}:00",
-                "end": f"{todo['날짜']}T{todo.get('종료시간', todo['시간'])}:00", # 👈 종료 시간 주입!
+                "end": f"{todo['날짜']}T{todo.get('종료시간', todo['시간'])}:00",
                 "backgroundColor": color,
                 "borderColor": color,
                 "allDay": False
