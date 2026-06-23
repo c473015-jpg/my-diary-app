@@ -56,7 +56,7 @@ def format_todos_for_calendar(todos):
                 "start": f"{todo['날짜']}",
                 "backgroundColor": color,
                 "borderColor": color,
-                "allDay": True
+                "allDay": False
             })
         else:
             calendar_events.append({
