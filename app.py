@@ -71,10 +71,16 @@ with tab2:
     
     if current_todos:
         for i, todo in enumerate(current_todos):
-            c1, c2, c3 = st.columns([1, 4, 1])
+            c1, c2, c3 = st.columns([1.5, 4, 1])
             c1.write(f"🕒 {todo['시간']} ~ {todo.get('종료시간', todo['시간'])}")
+            
             color_codes = {"학교":"#9B59B6", "공부":"#3498DB", "약속":"#E67E22", "알바":"#E74C3C", "기타":"#95A5A6"}
             cat_color = color_codes.get(todo['카테고리'], "#000")
+            
+            # 🌟 [수정] 완료 여부와 상관없이 무조건 취소선 없는 깔끔한 텍스트로 한 줄 출력합니다!
+            c2.markdown(f"<span style='color:{cat_color}; font-weight:bold;'>[{todo['카테고리']}]</span> {todo['내용']}", unsafe_allow_html=True)
+                
+            todo["완료"] = c3.checkbox("완료", value=todo["완료"], key=f"todo_{i}_{todo['시간']}_{sel_date_obj}")
             
             content_display = f"<span style='color:{cat_color}; font-weight:bold;'>[{todo['카테고리']}]</span> {todo['내용']}"
             if todo["완료"]:
