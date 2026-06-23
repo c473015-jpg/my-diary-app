@@ -33,30 +33,25 @@ def _format_time_to_pm(time_str):
         return time_str
     
 def format_todos_for_calendar(todos):
-    """일정 데이터를 카테고리별 색상만 입혀 월간 달력에 깔끔하게 나오도록 변환합니다."""
+    """일정 데이터를 카테고리별 색상만 입혀 달력에 나오도록 변환합니다."""
     COLOR_MAP = {
-        "학교": "#9B59B6",      # 보라색
-        "공부": "#3498DB",      # 파란색
-        "약속": "#E67E22",      # 주황색 👈 이 글자와 색상이 정확히 일치해야 합니다!
-        "알바": "#7E1D1D",      # 짙은 빨간색
-        "기타": "#95A5A6"       # 회색
+        "학교": "#9B59B6", "공부": "#3498DB", "약속": "#E67E22", "알바": "#7E1D1D", "기타": "#95A5A6"
     }
     
     calendar_events = []
     for todo in todos:
-        # 카테고리가 매칭되지 않으면 기본 회색(#34495E)을 쓰도록 안전장치 마련
         color = COLOR_MAP.get(todo.get("카테고리", "기타"), "#95A5A6")
-        
         event_title = f"[{todo.get('카테고리', '기타')}] {todo.get('내용', '')}"
         
-        # 🌟 핵심: '하루종일' 옵션이 없어도 에러 없이 모두 동일한 형태(동그라미 점)로 맞춥니다.
+        # 🌟 핵심: 하루종일 일정이면 시간 데이터(T12:00 같은 값)를 절대 붙이지 않고 '날짜'만 보냅니다!
+        # 이렇게 해야 라이브러리가 완벽하게 'all-day' 칸으로 인식합니다.
         if todo.get("하루종일", False):
             calendar_events.append({
                 "title": event_title,
-                "start": f"{todo['날짜']}",
+                "start": f"{todo['날짜']}",  # 뒤에 시간 정보를 생략합니다.
                 "backgroundColor": color,
                 "borderColor": color,
-                "allDay": False
+                "allDay": True  # 위클리 달력 상단 allday 칸 진입 보장
             })
         else:
             calendar_events.append({
@@ -65,7 +60,7 @@ def format_todos_for_calendar(todos):
                 "end": f"{todo['날짜']}T{todo.get('종료시간', todo['시간'])}:00",
                 "backgroundColor": color,
                 "borderColor": color,
-                "allDay": False  # 👈 확실하게 동그라미 형태로 고정!
+                "allDay": False
             })
             
     return calendar_events
