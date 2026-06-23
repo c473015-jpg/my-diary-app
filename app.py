@@ -83,12 +83,6 @@ with tab2:
             todo["완료"] = c3.checkbox("완료", value=todo["완료"], key=f"todo_{i}_{todo['시간']}_{sel_date_obj}")
             
             content_display = f"<span style='color:{cat_color}; font-weight:bold;'>[{todo['카테고리']}]</span> {todo['내용']}"
-            if todo["완료"]:
-                c2.markdown(f"~~{content_display}~~", unsafe_allow_html=True)
-            else:
-                c2.markdown(content_display, unsafe_allow_html=True)
-                
-            todo["완료"] = c3.checkbox("완료", value=todo["완료"], key=f"todo_{i}_{todo['시간']}_{sel_date_obj}")
     else:
         st.info(f"{sel_date_obj.strftime('%m/%d')}에 등록된 일정이 없습니다. 아래에서 새로 추가해 보세요!")
 
