@@ -56,39 +56,44 @@ with tab1:
         "headerToolbar": {"left": "today prev,next", "center": "title", "right": "dayGridMonth,timeGridWeek"},
         "initialView": "dayGridMonth",
         "initialDate": str(k_today),
-        "selectable": False,  # 👈 오작동을 만드는 달력 자체 클릭 기능을 끄고 안전하게 조회용으로만 씁니다.
+        "selectable": False,
         "height": 600,
         "displayEventTime": False,
+        # 🌟 아래 줄을 추가하면 월간 달력(dayGridMonth)에서 allDay 일정도 꽉 찬 막대 대신 깔끔한 동그라미 텍스트로 그려집니다!
+        "eventDisplay": "block" if "timeGrid" in st.experimental_get_query_params().get("view", [""])[0] else "list-item",
     }
     
-    # 달력 그리기
     calendar(events=events, options=calendar_options, key="main_calendar")
 
-# --- Tab 2: 할 일 관리 ---
 # --- Tab 2: 할 일 관리 ---
 with tab2:
     st.header(f"📌 {sel_date_obj.strftime('%m/%d')} 일정 관리")
     
-    # 🌟 [이 줄을 교체] 기존 current_todos 추출 코드를 아래처럼 정렬(sorted)이 포함된 코드로 바꿉니다.
     raw_todos = [t for t in st.session_state.todos if t["날짜"] == sel_date_obj]
     current_todos = sorted(raw_todos, key=lambda x: x["시간"])
     
     if current_todos:
         for i, todo in enumerate(current_todos):
-            c1, c2, c3 = st.columns([1.5, 4, 1])
+            # 🌟 삭제 버튼 자리를 만들기 위해 비율을 [1.5, 3.5, 1, 1]로 쪼갭니다.
+            c1, c2, c3, c4 = st.columns([1.5, 3.5, 1, 1])
             
-            # 🌟 [이 줄을 교체] 하루종일 일정이면 all-day를, 아니면 기존 시간을 출력합니다.
             time_display = "all-day" if todo.get("하루종일", False) else f"{todo['시간']} ~ {todo.get('종료시간', todo['시간'])}"
             c1.write(f"🕒 {time_display}")
             
             color_codes = {"학교":"#9B59B6", "공부":"#3498DB", "약속":"#E67E22", "알바":"#E74C3C", "기타":"#95A5A6"}
             cat_color = color_codes.get(todo['카테고리'], "#000")
-            
             c2.markdown(f"<span style='color:{cat_color}; font-weight:bold;'>[{todo['카테고리']}]</span> {todo['내용']}", unsafe_allow_html=True)
+                
             todo["완료"] = c3.checkbox("완료", value=todo["완료"], key=f"todo_{i}_{todo['시간']}_{sel_date_obj}")
+            
+            # 🌟 4번째 칸에 삭제 버튼을 만들고, 누르면 전체 리스트에서 해당 일정을 제거합니다.
+            if c4.button("🗑️ 삭제", key=f"del_{i}_{todo['시간']}_{sel_date_obj}"):
+                st.session_state.todos.remove(todo)
+                st.success("일정이 삭제되었습니다!")
+                st.rerun()
     else:
         st.info(f"{sel_date_obj.strftime('%m/%d')}에 등록된 일정이 없습니다. 아래에서 새로 추가해 보세요!")
-
+        
     st.divider()
     st.write("### ➕ 새 일정 추가")
     with st.form("add_todo_form", clear_on_submit=True):
