@@ -65,9 +65,13 @@ with tab1:
     calendar(events=events, options=calendar_options, key="main_calendar")
 
 # --- Tab 2: 할 일 관리 ---
+# --- Tab 2: 할 일 관리 ---
 with tab2:
     st.header(f"📌 {sel_date_obj.strftime('%m/%d')} 일정 관리")
-    current_todos = [t for t in st.session_state.todos if t["날짜"] == sel_date_obj]
+    
+    # 🌟 [이 줄을 교체] 기존 current_todos 추출 코드를 아래처럼 정렬(sorted)이 포함된 코드로 바꿉니다.
+    raw_todos = [t for t in st.session_state.todos if t["날짜"] == sel_date_obj]
+    current_todos = sorted(raw_todos, key=lambda x: x["시간"])
     
     if current_todos:
         for i, todo in enumerate(current_todos):
