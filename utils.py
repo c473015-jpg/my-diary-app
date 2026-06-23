@@ -37,18 +37,19 @@ def format_todos_for_calendar(todos):
     COLOR_MAP = {
         "학교": "#9B59B6",      # 보라색
         "공부": "#3498DB",      # 파란색
-        "약속": "#E67E22",      # 주황색
+        "약속": "#E67E22",      # 주황색 👈 이 글자와 색상이 정확히 일치해야 합니다!
         "알바": "#7E1D1D",      # 짙은 빨간색
         "기타": "#95A5A6"       # 회색
     }
     
     calendar_events = []
     for todo in todos:
-        color = COLOR_MAP.get(todo["카테고리"], "#34495E")
+        # 카테고리가 매칭되지 않으면 기본 회색(#34495E)을 쓰도록 안전장치 마련
+        color = COLOR_MAP.get(todo.get("카테고리", "기타"), "#95A5A6")
         
-        # 🌟 달력 사각형 박스 안에는 오직 [카테고리]와 내용만 깔끔하게 표시합니다!
-        event_title = f"[{todo['카테고리']}] {todo['내용']}"
+        event_title = f"[{todo.get('카테고리', '기타')}] {todo.get('내용', '')}"
         
+        # 🌟 핵심: '하루종일' 옵션이 없어도 에러 없이 모두 동일한 형태(동그라미 점)로 맞춥니다.
         if todo.get("하루종일", False):
             calendar_events.append({
                 "title": event_title,
@@ -64,7 +65,7 @@ def format_todos_for_calendar(todos):
                 "end": f"{todo['날짜']}T{todo.get('종료시간', todo['시간'])}:00",
                 "backgroundColor": color,
                 "borderColor": color,
-                "allDay": False
+                "allDay": False  # 👈 확실하게 동그라미 형태로 고정!
             })
             
     return calendar_events
