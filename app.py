@@ -60,7 +60,7 @@ with tab1:
         "height": 600,
         "displayEventTime": False,
         # 🌟 아래 줄을 추가하면 월간 달력(dayGridMonth)에서 allDay 일정도 꽉 찬 막대 대신 깔끔한 동그라미 텍스트로 그려집니다!
-        "eventDisplay": "block" if "timeGrid" in st.experimental_get_query_params().get("view", [""])[0] else "list-item",
+        "eventDisplay": "list-item",
     }
     
     calendar(events=events, options=calendar_options, key="main_calendar")
@@ -93,7 +93,7 @@ with tab2:
                 st.rerun()
     else:
         st.info(f"{sel_date_obj.strftime('%m/%d')}에 등록된 일정이 없습니다. 아래에서 새로 추가해 보세요!")
-        
+
     st.divider()
     st.write("### ➕ 새 일정 추가")
     with st.form("add_todo_form", clear_on_submit=True):
